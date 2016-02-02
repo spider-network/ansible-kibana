@@ -1,0 +1,70 @@
+---
+- group:
+    name="{{ kibana_group }}"
+    state=present
+
+- user:
+    name="{{ kibana_user }}"
+    group="{{ kibana_group }}"
+    state=present
+    home=/var/lib/kibana
+
+- get_url:
+    url="{{ kibana_download_url }}"
+    dest="{{ kibana_download_target_dir }}/{{ kibana_download_url | basename }}"
+
+- unarchive:
+    src="{{ kibana_download_target_dir }}/{{ kibana_download_url | basename }}"
+    dest="{{ kibana_install_dir }}"
+    copy=no
+    owner="{{ kibana_user }}"
+    group="{{ kibana_group }}"
+
+- file:
+    path="{{ kibana_install_dir }}/kibana"
+    src="{{ kibana_install_dir }}/{{ kibana_download_url | basename | regex_replace('.zip|.tar.gz', '') }}"
+    owner="{{ kibana_user }}"
+    group="{{ kibana_group }}"
+    state=link
+
+- file:
+    path="{{ item }}"
+    owner="{{ kibana_user }}"
+    group="{{ kibana_group }}"
+    state=directory
+    mode=0744
+  with_items:
+    - "{{ kibana_log | dirname }}"
+    - "{{ kibana_config['pid.file'] }} | default('/var/run/kibana/kibana.pid') | dirname"
+
+- file:
+    path="{{ kibana_log }}"
+    owner="{{ kibana_user }}"
+    group="{{ kibana_group }}"
+    state=touch
+    mode=0644
+
+- name: configure upstart
+  template:
+    src=etc/init/kibana.conf.j2
+    dest=/etc/init/kibana.conf
+  notify:
+    - restart kibana
+
+- template:
+    src=kibana.yml.j2
+    dest="{{ kibana_install_dir }}/kibana/config/kibana.yml"
+    owner="{{ kibana_user }}"
+    group="{{ kibana_group }}"
+    mode=0644
+  notify:
+    - restart kibana
+
+- name: install plugins
+  command: "{{ kibana_install_dir }}/kibana/bin/kibana plugin --install {{ item.plugin }}"
+  become: yes
+  become_user: "{{ kibana_user }}"
+  ignore_errors: yes
+  with_items: kibana_plugins
+  notify:
+    - restart kibana
