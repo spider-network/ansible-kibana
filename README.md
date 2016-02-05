@@ -29,17 +29,15 @@ A simple playbook can look like:
 
 
 ### Variables
-| Name                                  | Default                    | Description |
-| ------------------------------------- | -------------------------- |------------ |
-| `kibana_user`                         | kibana                     |             |
-| `kibana_group`                        | kibana                     |             |
-| `kibana_download_url`                 | https://download.elastic.co/kibana/kibana/kibana-4.3.1-linux-x64.tar.gz | |
-| `kibana_download_target_dir`          | /usr/local/src             |             |
-| `kibana_install_dir`                  | /opt                       |             |
-| `kibana_log`                          | /var/log/kibana/kibana.log |             |
-| `kibana_nice_level`                   | 0                          |             |
-| `kibana_plugins`                      | []                         |             |
-| `kibana_config`                       | {}                         | see [kibana.yml](templates/kibana.yml.j2) |
+* `kibana_user`: (Default: kibana)
+* `kibana_group`: (Default: kibana)
+* `kibana_download_url`: (Default: https://download.elastic.co/kibana/kibana/kibana-4.3.1-linux-x64.tar.gz)
+* `kibana_download_target_dir`: (Default: */usr/local/src*)
+* `kibana_install_dir`: (Default: /opt)
+* `kibana_log`: (Default: */var/log/kibana/kibana.log*)
+* `kibana_nice_level`: (Default: 0)
+* `kibana_plugins`: (Default: [])
+* `kibana_config`: see [kibana.yml](https://github.com/elastic/kibana/blob/master/docs/kibana-yml.asciidoc) (Default: {})
 
 ### How to Contribute
 Please create an github issue with your bug report or feature request.
