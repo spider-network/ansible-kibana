@@ -1,7 +1,7 @@
 ---
 kibana_user: "kibana"
 kibana_group: "kibana"
-kibana_download_url: "https://download.elastic.co/kibana/kibana/kibana-4.4.0-linux-x64.tar.gz"
+kibana_download_url: "https://download.elastic.co/kibana/kibana/kibana-4.4.1-linux-x64.tar.gz"
 kibana_download_target_dir: "/usr/local/src"
 kibana_install_dir: "/opt"
 kibana_log: "/var/log/kibana/kibana.log"
