@@ -1,48 +1,67 @@
 ---
-- group:
+- name: create user group
+  group:
     name="{{ kibana_group }}"
     state=present
 
-- user:
+- name: create user
+  user:
     name="{{ kibana_user }}"
     group="{{ kibana_group }}"
     state=present
     home=/var/lib/kibana
 
-- get_url:
+- name: download kibana
+  get_url:
     url="{{ kibana_download_url }}"
     dest="{{ kibana_download_target_dir }}/{{ kibana_download_url | basename }}"
 
-- unarchive:
+- name: extract kibana
+  unarchive:
     src="{{ kibana_download_target_dir }}/{{ kibana_download_url | basename }}"
     dest="{{ kibana_install_dir }}"
     copy=no
     owner="{{ kibana_user }}"
     group="{{ kibana_group }}"
 
-- file:
+- name: symlink current kibana version
+  file:
     path="{{ kibana_install_dir }}/kibana"
     src="{{ kibana_install_dir }}/{{ kibana_download_url | basename | regex_replace('.zip|.tar.gz', '') }}"
     owner="{{ kibana_user }}"
     group="{{ kibana_group }}"
     state=link
 
-- file:
-    path="{{ item }}"
+- name: create log directory
+  file:
+    path="{{ kibana_log | dirname }}"
     owner="{{ kibana_user }}"
     group="{{ kibana_group }}"
     state=directory
-    mode=0744
-  with_items:
-    - "{{ kibana_log | dirname }}"
-    - "{{ kibana_config['pid.file'] }} | default('/var/run/kibana/kibana.pid') | dirname"
+    mode=0755
 
-- file:
+- name: create log file
+  file:
     path="{{ kibana_log }}"
     owner="{{ kibana_user }}"
     group="{{ kibana_group }}"
     state=touch
     mode=0644
+
+- set_fact:
+    pid_file=/var/run/kibana/kibana.pid
+
+- set_fact:
+    pid_file="{{ kibana_config['pid.file'] }}"
+  when: kibana_config['pid.file'] is defined
+
+- name: create pid file directory
+  file:
+    path="{{ pid_file | dirname }}"
+    owner="{{ kibana_user }}"
+    group="{{ kibana_group }}"
+    state=directory
+    mode=0755
 
 - name: configure upstart
   template:
@@ -51,7 +70,8 @@
   notify:
     - restart kibana
 
-- template:
+- name: update kibana configuration
+  template:
     src=kibana.yml.j2
     dest="{{ kibana_install_dir }}/kibana/config/kibana.yml"
     owner="{{ kibana_user }}"
@@ -60,8 +80,17 @@
   notify:
     - restart kibana
 
+- name: uninstall plugins
+  command: "{{ kibana_install_dir }}/kibana/bin/kibana plugin --remove {{ item.plugin }}"
+  become: yes
+  become_user: "{{ kibana_user }}"
+  ignore_errors: yes
+  with_items: kibana_plugins
+  notify:
+    - restart kibana
+
 - name: install plugins
-  command: "{{ kibana_install_dir }}/kibana/bin/kibana plugin --install {{ item.plugin }}"
+  command: "{{ kibana_install_dir }}/kibana/bin/kibana plugin --install {{ item.org }}/{{ item.plugin }}/{{ item.version }}"
   become: yes
   become_user: "{{ kibana_user }}"
   ignore_errors: yes

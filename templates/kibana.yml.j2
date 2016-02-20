@@ -25,7 +25,7 @@ kibana.index: ".kibana"
 
 {% if kibana_config['pid.file'] is not defined %}
 # Set the path to where you would like the process id file to be created.
-pid.file: "/var/run/kibana/kibana.pid"
+pid.file: "{{ pid_file }}"
 {% endif %}
 
 # If you are running kibana behind a proxy, and want to mount it at a path,

@@ -24,7 +24,9 @@ A simple playbook can look like:
 
   vars:
     kibana_plugins:
-      - plugin: elastic/sense
+      - org: elastic
+        plugin: sense
+        version: latest
 ```
 
 
