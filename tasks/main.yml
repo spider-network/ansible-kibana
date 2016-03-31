@@ -64,10 +64,11 @@
     state=directory
     mode=0755
 
-- name: configure upstart
+- name: configure start script
   template:
-    src=etc/init/kibana.conf.j2
-    dest=/etc/init/kibana.conf
+    src=etc/init/kibana.j2
+    dest=/etc/init.d/kibana
+    mode=0755
   notify:
     - restart kibana
 
