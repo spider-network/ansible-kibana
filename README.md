@@ -33,7 +33,7 @@ A simple playbook can look like:
 ### Variables
 * `kibana_user`: (Default: kibana)
 * `kibana_group`: (Default: kibana)
-* `kibana_download_url`: (Default: https://download.elastic.co/kibana/kibana/kibana-4.4.2-linux-x64.tar.gz)
+* `kibana_download_url`: (Default: https://download.elastic.co/kibana/kibana/kibana-4.5.0-linux-x64.tar.gz)
 * `kibana_download_target_dir`: (Default: */usr/local/src*)
 * `kibana_install_dir`: (Default: /opt)
 * `kibana_log`: (Default: */var/log/kibana/kibana.log*)
