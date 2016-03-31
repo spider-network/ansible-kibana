@@ -9,6 +9,7 @@
     name="{{ kibana_user }}"
     group="{{ kibana_group }}"
     state=present
+    shell=/bin/bash
     home=/var/lib/kibana
 
 - name: download kibana
